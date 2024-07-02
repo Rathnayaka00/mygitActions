@@ -1,0 +1,33 @@
+name: CI/CD
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Set up Google credentials
+      # Create the credentials file from the secret
+      run: echo "${{ secrets.GOOGLE_CREDENTIALS_JSON }}" > $GITHUB_WORKSPACE/google-credentials.json
+
+    - name: Run application (or tests)
+      # Set the environment variable to point to the credentials file
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS: $GITHUB_WORKSPACE/google-credentials.json
+      run: |
+        # Example command to run your application or tests
+        python your_script.py
